@@ -132,4 +132,4 @@ Unidad de Tecnologías de Información y Comunicaciones (UTIC)
 📧 [ledvirabp@gmail.com](mailto:ledvirabp@gmail.com)
 
 **Última actualización:**
-🔄 Febrero de 2026
+🔄 Marso de 2026

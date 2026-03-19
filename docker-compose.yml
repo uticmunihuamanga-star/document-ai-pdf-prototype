@@ -1,0 +1,50 @@
+# docker-compose.yml
+
+services:
+  document-ai-app:
+    # Para desarrollo local:
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile
+
+    # Para usar la imagen subida a Docker Hub:
+    image: ledvirbau/document-ai-prototype:latest
+    container_name: document-ai-pdf
+    ports:
+      - "8501:8501"
+    environment:
+      # Rutas Linux para OCR
+      - TESSERACT_PATH=/usr/bin/tesseract
+      - POPPLER_PATH=/usr/bin
+      
+      # Configuraciones de la App
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - MAX_RETRIES=${MAX_RETRIES:-2}
+      - REQUEST_TIMEOUT=${REQUEST_TIMEOUT:-60}
+      
+      # --- CRÍTICO: Cambio a PLURAL para el Pool de Llaves ---
+      - GOOGLE_API_KEYS=${GOOGLE_API_KEYS}
+      
+      # Modelo de IA a utilizar (Cambiado el fallback a 1.5-flash para evitar límites)
+      - AI_MODEL=${AI_MODEL:-gemini-2.5-flash-lite}
+      
+      # Supabase (Almacenamiento en la nube)
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_KEY=${SUPABASE_KEY}
+      - SUPABASE_BUCKET=${SUPABASE_BUCKET:-documentos}
+      
+      # Configuraciones de Streamlit (Estabilidad)
+      - STREAMLIT_BROWSER_GATHER_USAGE_STATS=false
+      - STREAMLIT_SERVER_FILE_WATCHER_TYPE=none
+      - STREAMLIT_SERVER_HEADLESS=true
+      
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+      
